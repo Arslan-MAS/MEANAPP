@@ -1,0 +1,20 @@
+
+
+  <mat-expansion-panel (opened)="panelOpenState = true"
+                        (closed)="panelOpenState = false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{ title }}
+        </mat-panel-title>
+        <mat-panel-description>
+          <!-- Currently I am {{panelOpenState ? 'open' : 'closed'}} -->
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <p>{{ content }} </p>
+
+      <mat-action-row>
+        <button mat-button color="warn" (click)="onDelete(id)">Delete</button>
+        <button mat-button color="primary" [routerLink]='["/edit" , id]' >Edit</button>
+      </mat-action-row>
+  </mat-expansion-panel>
+
