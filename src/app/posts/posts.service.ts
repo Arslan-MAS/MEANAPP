@@ -11,71 +11,93 @@ import { Post } from "./model/post.model";
 )
 export class PostsService {
 
-  public eventOmitter:Subject<Post[]>=new Subject<Post[]>() ;
+  public eventOmitter:Subject<{posts : Post[], maxPosts :number}>=new Subject< {posts : Post[], maxPosts :number}>() ;
   private posts:Post[] = [];
   constructor(private http :HttpClient , private router :Router){
 
   }
-  getPosts(){
-    this.http.get<{message:String,posts:any}>('http://localhost:3000/api/posts').pipe(map((resBody)=>{
-      return resBody.posts.map( (eachPost) => {
+  getPosts(postsPerPage :number , currentPage:number){
+    const queryParams =`?pagesize=${postsPerPage}&page=${currentPage}`;
+    this.http.get<{message:String,posts:any,maxPosts:number}>('http://localhost:3000/api/posts'+queryParams).pipe(map((resBody)=>{
+      return {posts :resBody.posts.map( (eachPost) => {
         return {
 
           Id: eachPost._id,
           Content:eachPost.Content,
-          Title:eachPost.Title
+          Title:eachPost.Title,
+          ImagePath :eachPost.ImagePath,
 
         }
       })
 
+    , maximumPosts :resBody.maxPosts
+    }
+
     })).
-    subscribe((transformedPosts)=>{
-      this.posts=transformedPosts;
-      this.eventOmitter.next([...this.posts])
+    subscribe((transformedPostsData)=>{
+      this.posts=transformedPostsData.posts;
+      this.eventOmitter.next({posts : [...this.posts],maxPosts:transformedPostsData.maximumPosts})
     });
 
   }
   getPostUpdateListener(){
     return this.eventOmitter.asObservable();
   }
-  addPosts(post:Post){
-    this.http.post<{message:String ,Id:String}>('http://localhost:3000/api/posts',post).subscribe((responseData)=>{
+  addPosts(post:Post , image : File){
+    const postData = new FormData () ;
+    postData.append("Title", post.Title as string );
+    postData.append("Content", post.Content as string );
+    postData.append ("image", image , post.Title as string )
+    this.http.post<{message:String ,post:Post}>('http://localhost:3000/api/posts',postData).subscribe((responseData)=>{
 
-      post.Id = responseData.Id;
-      this.posts.push(post);
-      this.eventOmitter.next([...this.posts])
+      // post.Id = responseData.post.Id;
+      // post.ImagePath = responseData.post.ImagePath ;
+      // this.posts.push(post);
+      // this.eventOmitter.next([...this.posts])
       this.router.navigate(["/"]);
     });
 
   }
   deletePost (postId :String) {
-   this.http.delete('http://localhost:3000/api/posts/'+postId).subscribe(()=>{
-
-
-    const updatedPosts = this.posts.filter( post=> {
-      return  post.Id !== postId ;
-    });
-    this.posts=updatedPosts;
-    this.eventOmitter.next([...updatedPosts]);
-    this.router.navigate(["/"]);
-   } )
+    return this.http.delete('http://localhost:3000/api/posts/'+postId);
   }
   getPost (postId :String){
     return this.http.get<Post>('http://localhost:3000/api/posts/'+postId);
   }
-  updatePost (id : String ,  title :String , content :String ){
-    const post :Post = {
-      Id : id ,
-      Title :title ,
-      Content :content
-    }
-    this.http.put('http://localhost:3000/api/posts/'+id,post).subscribe((responseData)=>{
+  updatePost (id : String ,  title :String , content :String , image : string |File){
 
-      const updatedPosts = [ ...this.posts];
-      const oldPostIndex  = updatedPosts.findIndex( (epost)=>epost.Id==post.Id );
-      updatedPosts[oldPostIndex]= post ;
-      this.posts = updatedPosts ;
-      this.eventOmitter.next([...this.posts]);
+    var  postData :Post | FormData;
+    if (typeof (image)=== "string" ){
+        postData  = new Post (
+
+        title ,
+        content,
+         id ,
+        image ,
+        )
+
+    }else if (typeof (image) == "object") {
+      postData = new FormData() ;
+      postData.append("Id" ,id as string);
+      postData.append("Title", title as string );
+      postData.append("Content", content as string );
+      postData.append ("image", image , title as string )
+    }
+
+    this.http.put<{post:Post}>('http://localhost:3000/api/posts/'+id,postData).subscribe((responseData)=>{
+
+      // const updatedPosts = [ ...this.posts];
+      // var post =new Post (
+
+      //   title ,
+      //   content,
+      //   id ,
+      //   "",
+      //   )
+      // const oldPostIndex  = updatedPosts.findIndex( (epost)=>epost.Id==post.Id );
+      // updatedPosts[oldPostIndex]= post ;
+      // this.posts = updatedPosts ;
+      // this.eventOmitter.next([...this.posts]);
       this.router.navigate(["/"]);
     });
   }

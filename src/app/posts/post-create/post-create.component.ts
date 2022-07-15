@@ -3,6 +3,7 @@ import { FormControl, FormGroup, NgForm, Validators } from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { Post } from "../model/post.model";
 import { PostsService } from "../posts.service";
+import { mimeType } from "./mime-type.validator";
 enum Mode {
   create,
   edit
@@ -31,7 +32,8 @@ export class PostCreateComponent implements OnInit{
     this.form= new FormGroup({
       'title'  : new FormControl(null,{ validators :[Validators.required, Validators.minLength(3)]}),
       'content' : new FormControl(null , {validators:[Validators.required]}),
-      'image' : new FormControl ( null, { validators : [ Validators.required]}) ,
+      'image' : new FormControl ( null, { validators : [ Validators.required] ,
+         asyncValidators:[mimeType]}) ,
 
     });
     this.route.paramMap.subscribe((paramMap:ParamMap)=>{
@@ -48,7 +50,9 @@ export class PostCreateComponent implements OnInit{
               this.post=responsePost;
               this.form.setValue({
                 "title":this.post.Title,
-                "content": this.post.Content})
+                "content": this.post.Content,
+                "image" : this.post.ImagePath
+              })
           }
           );
       }else {
@@ -67,10 +71,10 @@ export class PostCreateComponent implements OnInit{
     if (this.mode===Mode.create){
 
       const post:Post= new Post (this.form.value.title , this.form.value.content);
-      this.postService.addPosts(post);
+      this.postService.addPosts(post, this.form.value.image);
       this.form.reset();
     }else if (this.mode==Mode.edit){
-      this.postService.updatePost(this.postId ,this.form.value.title,this.form.value.content);
+      this.postService.updatePost(this.postId ,this.form.value.title,this.form.value.content,this.form.value.image );
     }
 
     //this.postCreated.emit(post);

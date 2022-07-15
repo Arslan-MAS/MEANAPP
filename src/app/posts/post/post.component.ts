@@ -11,11 +11,18 @@ export class PostComponent {
   @Input("Title") title:String ;
   @Input("Content")  content:String ;
   @Input ("Id") id :String ;
+  @Input ("ImagePath") imagePath :String ;
+
+  @Input () postsPerPage :number ;
+  @Input () currentPage :number ;
 
   constructor ( private postsService : PostsService){
 
   }
   onDelete (id :String){
-    this.postsService.deletePost(id);
+    this.postsService.deletePost(id).subscribe(()=>{
+      this.postsService.getPosts(0,0);
+
+    });
   }
 }
