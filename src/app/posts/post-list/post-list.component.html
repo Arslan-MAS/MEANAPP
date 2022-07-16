@@ -1,7 +1,7 @@
 
 <mat-spinner *ngIf="isLoading"></mat-spinner>
 <mat-accordion  multi="true" *ngIf="posts.length>0  && !isLoading">
-  <app-post *ngFor="let post of posts" [Title]="post.Title" [Content]="post.Content" [Id]="post.Id" [ImagePath]="post.ImagePath"  [postsPerPage]="pageSize" [currentPage]="currentPage"></app-post>
+  <app-post *ngFor="let post of posts" [Title]="post.Title" [Content]="post.Content" [Id]="post.Id" [ImagePath]="post.ImagePath"  [postsPerPage]="pageSize" [currentPage]="currentPage" [postUserId]="post.Creator"></app-post>
 </mat-accordion>
 <mat-paginator *ngIf="posts.length> 0" (page)="onChangePage($event)" [length]="totalPosts" [pageSize]="postsPerPage" [pageSizeOptions]="pageSizeOptions">
 

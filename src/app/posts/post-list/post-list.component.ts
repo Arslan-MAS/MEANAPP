@@ -23,12 +23,14 @@ public totalPosts = 0 ;
 public postsPerPage = 2 ;
 public pageSizeOptions = [1,2,5,10];
 public currentPage =1 ;
+
 constructor(public postService :PostsService){
 
 }
 ngOnInit(): void {
   this.isLoading= true;
   this.postService.getPosts(this.postsPerPage,this.currentPage);
+
    this.subscription =this.postService.getPostUpdateListener().subscribe(
     (postsData)=>{
       this.isLoading= false ;

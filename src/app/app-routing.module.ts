@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule,Routes } from "@angular/router";
+import { AuthGuard } from "./auth/auth.guard";
 import { LoginComponent } from "./auth/login/login.component";
 import { SignUpComponent } from "./auth/signup/signup.component";
 import { PostCreateComponent } from "./posts/post-create/post-create.component";
@@ -10,10 +11,10 @@ const routes:Routes= [
     path:'', component: PostListComponent
   },
   {
-    path: 'create' , component:PostCreateComponent
+    path: 'create' , component:PostCreateComponent , canActivate:[AuthGuard]
   },
   {
-    path:'edit/:id' , component:PostCreateComponent
+    path:'edit/:id' , component:PostCreateComponent,canActivate:[AuthGuard]
   },
   {
     path:'login',component:LoginComponent
@@ -24,7 +25,8 @@ const routes:Routes= [
 ];
 @NgModule({
   imports:[RouterModule.forRoot(routes)],
-  exports:[RouterModule]
+  exports:[RouterModule],
+  providers:[AuthGuard]
 })
 export class AppRoutingModule{
 

@@ -4,11 +4,13 @@ export class Post {
   public Content :String;
   public Id? : String ;
   public ImagePath? : String ;
-  constructor( title :String , content :String , id :String= "" , ImagePath= "" ) {
+  public Creator: String ;
+  constructor( title :String , content :String , id :String= "" , ImagePath= "", Creator ="" ) {
     this.Title = title ;
     this.Content = content ;
     this.Id = id;
     this.ImagePath = ImagePath;
+    this.Creator= Creator ;
   }
 
 

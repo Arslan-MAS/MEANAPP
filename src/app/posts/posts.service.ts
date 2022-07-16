@@ -26,7 +26,7 @@ export class PostsService {
           Content:eachPost.Content,
           Title:eachPost.Title,
           ImagePath :eachPost.ImagePath,
-
+          Creator : eachPost.Creator
         }
       })
 
@@ -72,7 +72,7 @@ export class PostsService {
 
         title ,
         content,
-         id ,
+        id ,
         image ,
         )
 
